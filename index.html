@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="CSS/style.css">
+    <title>JS Game</title>
+</head>
+<body>
+
+    <div id="timer"></div>
+    
+    <div id="board"></div>
+
+    <script>
+
+        function shuffleChildren(parent) { // Fonction qui mélange aléatoirement l'enfant d'un parent (fonction générique pour pouvoir l'utiliser sur d'autres situations)
+            let children = parent.children
+            let i = board.children.length, k, temp 
+            while(--i > 0) {                            // Tant que i - i est positif, instructions
+                k = Math.floor(Math.random() * (i+1))   // k stocke un nombre aléatoire basé sur i
+                temp = board.children[k]                // temp pointe temporairement l'élément à la position k dans board
+                board.children[k] = board.children[i]   // remplace l'élément à la position k par l'élément à la position i
+                board.appendChild(temp)                 // place l'élément k pointé temporairement à la fin du contenu de board
+            }
+        }
+
+        function showReaction(type, clickedBox) { 
+            clickedBox.classList.add(type)
+            if(type !== "success") {
+                setTimeout(function(){
+                    clickedBox.classList.remove(type)
+                }, 800)
+            }
+        }        
+
+        const box = document.createElement("div") // On créer un constante "box" qui est un élément HTML "div" du document 
+
+        box.classList.add("box")                  // On accède à la "classList" (liste des classes associé à box-> c'est-à-dire la div qu'on a créé plus haut), et on y insère "box"
+                                                  // |_ de cette manière, on créer "<div class='box'></div>" dans notre document HTML
+
+        const board = document.querySelector("#board") // On sélectionne le premier élément ayant comme ID "board" de notre document
+        
+        let nb = 1
+        let boardLength = window.prompt("Insérez la taille de grille souhaitée.")
+
+        for (let i = 1; i <= (boardLength); i++) {     // i = 1, tant que i <= 10, faire i+1 et exéctuer les instructions de la boucle for
+            const newbox = box.cloneNode()             // Nouvelle variable de block : un clone (cloneNode) de la constante globale "box"
+            newbox.innerText = i                       // On insère (innerText) la valeur de i dans la variable newbox
+            board.appendChild(newbox)                  // On déclare que newbox devient le dernier enfant de l'élément board
+
+            newbox.addEventListener("click", function() {   // On ajoute un event listener (écouteur d'évènement), qui réponse (callback) à un click par une fonction
+
+                if(i == nb) {                                                   // Si, (lors de l'évènement(clique)) i est égal à nb
+                    newbox.classList.add("box-clicked")                         // On incrémente "box-clicked" comme valeur de classe à la liste de classes de la constante newbox (newbox = <div class="box-clicked">i</div>)
+                    // shuffleChildren(board)                                   // Si on veut mélanger le tableau à chaque clique
+                    if (nb == board.children.length) {                          // Si nb est égal à la longueur du board (nombre de newbox) :
+                        board.querySelectorAll(".box").forEach(function(box) {  // Pour toute les box du board :
+                            showReaction("success", box)                        // On appelle la fonction showReaction en lui attribuant un type "success"
+                        })
+                    }
+                    nb++
+
+                } else if (i > nb) {                                                    // Sinon, si i est inférieur à nb :
+                    showReaction("error", newbox)                                       // On appelle la fonction showReaction en lui attribuant un type "error"
+                    nb = 1                                                              // On reset la valeur de nb à 1 pour redémarrer le jeu
+                    shuffleChildren(board)                                              // On remélange le board
+                    board.querySelectorAll(".box-clicked").forEach(function(validBox){  // Dans la constante board, on sélectionne tous les éléments ayant comme classe "box-clicked"
+                        validBox.classList.remove("box-clicked")                        // Puis, pour chaque (foreach) validBox dans board, retirer "box-clicked" de la classe
+                    })
+
+                } else {                           // Sinon :
+                    showReaction("notice", newbox) // On appelle la fonction showReaction en lui attribuant un type "notice"
+                }
+
+            })
+        }
+
+        shuffleChildren(board) // On appelle la fonction shuffleChildren sur la div board : shuffleChildren(board), ce qui appliquera la fonction sur ses enfant(s) (ici, newbox (l.39))
+
+        
+
+    </script>
+
+</body>
+</html>
